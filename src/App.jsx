@@ -36,15 +36,10 @@ const ProductCard = ({ prod, onClick, index }) => {
 
   return (
     <motion.div
-      // 1. Inicia abajo y transparente
       initial={{ opacity: 0, y: 40 }}
-      // 2. Se anima SOLO cuando entra en el campo de visión de la pantalla
       whileInView={{ opacity: 1, y: 0 }}
-      // 3. amount: 0.1 asegura que se dispare cuando asome el 10% de la tarjeta. once: true evita que se vuelva a animar si subes y bajas.
       viewport={{ once: true, amount: 0.1 }}
-      // 4. El delay calculado crea la cascada de izquierda a derecha en cada fila nueva que descubres
       transition={{ duration: 0.6, ease: "easeOut", delay: (index % 6) * 0.1 }}
-      
       className="group cursor-pointer flex flex-col font-sans"
       onClick={onClick}
     >
@@ -91,22 +86,21 @@ export default function App() {
   const productosPorSlide = 6;
   const maxSlidesHome = 4;
 
-useEffect(() => {
-  async function cargarDatosMenu() {
-    // Cargamos 3 lotes para cubrir hasta 3,000 productos en el Navbar
-    const { data: lote1 } = await supabase.from('productos').select('liga, equipo, categoria').range(0, 999);
-    const { data: lote2 } = await supabase.from('productos').select('liga, equipo, categoria').range(1000, 1999);
-    const { data: lote3 } = await supabase.from('productos').select('liga, equipo, categoria').range(2000, 2999);
+  useEffect(() => {
+    async function cargarDatosMenu() {
+      const { data: lote1 } = await supabase.from('productos').select('liga, equipo, categoria').range(0, 999);
+      const { data: lote2 } = await supabase.from('productos').select('liga, equipo, categoria').range(1000, 1999);
+      const { data: lote3 } = await supabase.from('productos').select('liga, equipo, categoria').range(2000, 2999);
 
-    let datosCompletos = [];
-    if (lote1) datosCompletos = [...lote1];
-    if (lote2) datosCompletos = [...datosCompletos, ...lote2];
-    if (lote3) datosCompletos = [...datosCompletos, ...lote3];
+      let datosCompletos = [];
+      if (lote1) datosCompletos = [...lote1];
+      if (lote2) datosCompletos = [...datosCompletos, ...lote2];
+      if (lote3) datosCompletos = [...datosCompletos, ...lote3];
 
-    setMenuData(datosCompletos);
-  }
-  cargarDatosMenu();
-}, []);
+      setMenuData(datosCompletos);
+    }
+    cargarDatosMenu();
+  }, []);
 
   useEffect(() => {
     async function traerProductos() {
@@ -121,12 +115,20 @@ useEffect(() => {
       let query = supabase.from('productos').select('*', { count: 'exact' });
 
       if (busqueda !== '') {
+        // BÚSQUEDA ESCRITA: Usa % para coincidencias parciales (ej: "madrid" encuentra "Real Madrid")
         query = query.or(`nombre.ilike.%${busqueda}%,equipo.ilike.%${busqueda}%,liga.ilike.%${busqueda}%`);
       } else if (categoriaActual !== 'Todas') {
+        // CLICS EN EL MENÚ: Búsqueda exacta (sin los comodines %)
         const catNav = categoriaActual.toLowerCase();
-        if (catNav === 'futbol') query = query.eq('categoria', 'jerseys');
-        else if (catNav === 'mundial 2026') query = query.eq('categoria', 'MUNDIAL 2026');
-        else query = query.or(`nombre.ilike.%${categoriaActual}%,equipo.ilike.%${categoriaActual}%,liga.ilike.%${categoriaActual}%`);
+        if (catNav === 'futbol') {
+          query = query.eq('categoria', 'jerseys');
+        } else if (catNav === 'mundial 2026') {
+          query = query.eq('categoria', 'MUNDIAL 2026');
+        } else {
+          // Esto busca exactamente la liga, el equipo o la categoría (sin importar mayúsculas/minúsculas)
+          // Al no tener los símbolos '%', "LIGA" nunca coincidirá con "BUNDESLIGA"
+          query = query.or(`equipo.ilike.${categoriaActual},liga.ilike.${categoriaActual},categoria.ilike.${categoriaActual}`);
+        }
       }
 
       const { data, error, count } = await query.range(desde, hasta).order('id', { ascending: false });
@@ -170,7 +172,7 @@ useEffect(() => {
       <Navbar
         setCategoriaActual={setCategoriaActual}
         setBusqueda={setBusqueda}
-        busqueda={busqueda} // <--- ¡Asegúrate de que esta línea exista!
+        busqueda={busqueda} 
         categoriaActual={categoriaActual}
         onNavAction={() => setSelectedProduct(null)}
         camisetas={menuData}
@@ -234,7 +236,6 @@ useEffect(() => {
                       className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-x-4 gap-y-10"
                     >
                       {productosSlider.map((prod, idx) => (
-                        /* Le pasamos el index para que calcule el delay */
                         <ProductCard key={`${slideHomeIndex}-${prod.id || idx}`} prod={prod} index={idx} onClick={() => setSelectedProduct(prod)} />
                       ))}
                     </motion.div>
@@ -259,10 +260,8 @@ useEffect(() => {
                   </div>
                 ) : (
                   <>
-                    {/* Quitamos el motion.div complejo de aquí, porque cada tarjeta ahora se anima sola */}
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
                       {camisetas.map((prod, idx) => (
-                        /* El index aquí es la clave de la cascada al scrollear */
                         <ProductCard key={prod.id || idx} prod={prod} index={idx} onClick={() => setSelectedProduct(prod)} />
                       ))}
                     </div>

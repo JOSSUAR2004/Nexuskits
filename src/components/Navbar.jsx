@@ -7,7 +7,11 @@ export default function Navbar({ setCategoriaActual, setBusqueda, busqueda, onNa
   const [activeTab, setActiveTab] = useState(null);
   const [activeSub, setActiveSub] = useState(null);
   const [activeThird, setActiveThird] = useState(null);
+  
+  // Estados para el menú móvil
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileExpandedTab, setMobileExpandedTab] = useState(null);
+  const [mobileExpandedSub, setMobileExpandedSub] = useState(null);
 
   // --- LÓGICA DE AUTO-DETECCIÓN UNIVERSAL ---
   const menuData = useMemo(() => {
@@ -44,7 +48,6 @@ export default function Navbar({ setCategoriaActual, setBusqueda, busqueda, onNa
 
   const handleSelect = (cat) => {
     setCategoriaActual(cat);
-    // Limpiamos la búsqueda al navegar
     if (setBusqueda) setBusqueda(''); 
     if (onNavAction) onNavAction();
     resetMenu();
@@ -64,11 +67,8 @@ export default function Navbar({ setCategoriaActual, setBusqueda, busqueda, onNa
 
   return (
     <>
-      <nav
-        className="sticky top-0 z-[1000] bg-black flex items-center h-[85px] px-6 md:px-12 border-b border-white/5"
-        onMouseLeave={resetMenu}
-      >
-        {/* --- LOGO --- */}
+      <nav className="sticky top-0 z-[1000] bg-black flex items-center h-[85px] px-6 md:px-12 border-b border-white/5" onMouseLeave={resetMenu}>
+        {/* LOGO */}
         <div className="flex-none mr-8 md:mr-14">
           <Link to="/" onClick={() => handleSelect('Todas')} className="flex flex-col leading-[0.75] select-none italic">
             <span className="text-[24px] md:text-[30px] font-[1000] tracking-tighter text-[#5ec6ed] uppercase">NEXUS</span>
@@ -76,72 +76,44 @@ export default function Navbar({ setCategoriaActual, setBusqueda, busqueda, onNa
           </Link>
         </div>
 
-        {/* --- MENÚ PRINCIPAL (ESCRITORIO) --- */}
+        {/* MENÚ PRINCIPAL (ESCRITORIO) */}
         <div className="hidden lg:flex flex-1 items-center justify-start gap-9 h-full">
           {Object.keys(menuData).map((tab) => (
-            <div
-              key={tab}
-              className="relative h-full flex items-center"
-              onMouseEnter={() => { setActiveTab(tab); setActiveSub(null); setActiveThird(null); }}
-            >
-              <button
-                onClick={() => handleSelect(tab)}
-                className="h-full text-[13.5px] font-medium uppercase tracking-[0.15em] text-white/90 hover:text-[#5ec6ed] transition-all duration-300"
-              >
+            <div key={tab} className="relative h-full flex items-center" onMouseEnter={() => { setActiveTab(tab); setActiveSub(null); setActiveThird(null); }}>
+              <button onClick={() => handleSelect(tab)} className="h-full text-[13.5px] font-medium uppercase tracking-[0.15em] text-white/90 hover:text-[#5ec6ed] transition-all duration-300">
                 {tab}
               </button>
 
               <AnimatePresence>
                 {activeTab === tab && Object.keys(menuData[tab]).length > 0 && (
-                  <motion.div
-                    variants={listVariants} initial="hidden" animate="visible" exit={{ opacity: 0 }}
-                    className="absolute top-[85px] left-[-15px] w-[240px] bg-[#0a0a0a] py-5 flex flex-col shadow-2xl border-t border-[#5ec6ed]/50 z-[1001]"
-                  >
+                  <motion.div variants={listVariants} initial="hidden" animate="visible" exit={{ opacity: 0 }} className="absolute top-[85px] left-[-15px] w-[240px] bg-[#0a0a0a] py-5 flex flex-col shadow-2xl border-t border-[#5ec6ed]/50 z-[1001]">
                     <div className="absolute -top-[20px] left-0 w-full h-[20px] bg-transparent" />
                     {Object.keys(menuData[tab]).map((sub) => (
                       <div key={sub} className="relative" onMouseEnter={() => { setActiveSub(sub); setActiveThird(null); }}>
-                        <motion.button
-                          variants={itemVariants}
-                          className={`w-full text-left px-8 py-[12px] text-[12px] font-bold uppercase tracking-widest transition-all ${activeSub === sub ? 'text-white bg-[#5ec6ed]/15' : 'text-zinc-400 hover:text-white'}`}
-                        >
+                        <motion.button variants={itemVariants} className={`w-full text-left px-8 py-[12px] text-[12px] font-bold uppercase tracking-widest transition-all ${activeSub === sub ? 'text-white bg-[#5ec6ed]/15' : 'text-zinc-400 hover:text-white'}`}>
                           {sub}
                         </motion.button>
 
-                        {/* TERCER NIVEL (EQUIPOS/PAÍSES) */}
+                        {/* TERCER NIVEL ESCRITORIO */}
                         {activeSub === sub && (
-                          <motion.div
-                            variants={listVariants} initial="hidden" animate="visible"
-                            className="absolute top-0 left-[100%] min-w-[250px] bg-[#0a0a0a] py-2 flex flex-col shadow-2xl border-l border-white/5"
-                          >
+                          <motion.div variants={listVariants} initial="hidden" animate="visible" className="absolute top-0 left-[100%] min-w-[250px] bg-[#0a0a0a] py-2 flex flex-col shadow-2xl border-l border-white/5">
                             <div className="absolute top-0 -left-[20px] w-[20px] h-full bg-transparent" />
                             {Array.isArray(menuData[tab][sub]) ? (
                               menuData[tab][sub].map((team) => (
-                                <motion.button
-                                  key={team} variants={itemVariants} onClick={() => handleSelect(team)}
-                                  className="w-full text-left px-8 py-[10px] text-[11px] font-bold uppercase text-zinc-400 hover:text-[#5ec6ed] transition-colors"
-                                >
+                                <motion.button key={team} variants={itemVariants} onClick={() => handleSelect(team)} className="w-full text-left px-8 py-[10px] text-[11px] font-bold uppercase text-zinc-400 hover:text-[#5ec6ed] transition-colors">
                                   {team}
                                 </motion.button>
                               ))
                             ) : (
                               Object.keys(menuData[tab][sub]).map((cont) => (
                                 <div key={cont} className="relative w-full" onMouseEnter={() => setActiveThird(cont)}>
-                                  <motion.button
-                                    variants={itemVariants}
-                                    className={`w-full text-left px-8 py-[12px] text-[11px] font-bold uppercase tracking-widest transition-all ${activeThird === cont ? 'text-white bg-[#5ec6ed]/15' : 'text-zinc-400 hover:text-white'}`}
-                                  >
+                                  <motion.button variants={itemVariants} className={`w-full text-left px-8 py-[12px] text-[11px] font-bold uppercase tracking-widest transition-all ${activeThird === cont ? 'text-white bg-[#5ec6ed]/15' : 'text-zinc-400 hover:text-white'}`}>
                                     {cont}
                                   </motion.button>
                                   {activeThird === cont && (
-                                    <motion.div
-                                      variants={listVariants} initial="hidden" animate="visible"
-                                      className="absolute top-0 left-[100%] w-[250px] bg-[#0a0a0a] py-2 flex flex-col shadow-2xl border-l border-white/5"
-                                    >
+                                    <motion.div variants={listVariants} initial="hidden" animate="visible" className="absolute top-0 left-[100%] w-[250px] bg-[#0a0a0a] py-2 flex flex-col shadow-2xl border-l border-white/5">
                                       {menuData[tab][sub][cont].map((country) => (
-                                        <motion.button
-                                          key={country} variants={itemVariants} onClick={() => handleSelect(country)}
-                                          className="w-full text-left px-8 py-[9px] text-[11px] font-bold uppercase text-zinc-400 hover:text-[#5ec6ed] transition-colors"
-                                        >
+                                        <motion.button key={country} variants={itemVariants} onClick={() => handleSelect(country)} className="w-full text-left px-8 py-[9px] text-[11px] font-bold uppercase text-zinc-400 hover:text-[#5ec6ed] transition-colors">
                                           {country}
                                         </motion.button>
                                       ))}
@@ -161,73 +133,114 @@ export default function Navbar({ setCategoriaActual, setBusqueda, busqueda, onNa
           ))}
         </div>
 
-        {/* --- ÁREA DERECHA: Buscador + Carrito + Menú Móvil --- */}
+        {/* ÁREA DERECHA: Buscador + Carrito + Menú Móvil */}
         <div className="flex items-center gap-4 md:gap-7 ml-auto">
-          
-          {/* BUSCADOR CONTROLADO */}
           <div className="relative group w-[140px] md:w-[220px] lg:w-[280px]">
-            <input
-              type="text"
-              placeholder="BUSCAR..."
-              value={busqueda || ''} // Conectado al estado para que se limpie
-              className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-sm text-[9px] md:text-[10px] tracking-[0.2em] uppercase focus:border-[#5ec6ed]/50 outline-none transition-all text-white placeholder:text-zinc-700"
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
+            <input type="text" placeholder="BUSCAR..." value={busqueda || ''} className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-sm text-[9px] md:text-[10px] tracking-[0.2em] uppercase focus:border-[#5ec6ed]/50 outline-none transition-all text-white placeholder:text-zinc-700" onChange={(e) => setBusqueda(e.target.value)} />
           </div>
 
-          {/* ICONO DE CARRITO */}
           <button className="relative text-white/90 hover:text-[#5ec6ed] transition-colors flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 md:w-7 md:h-7">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
-            <span className="absolute -top-1 -right-1.5 bg-[#5ec6ed] text-black text-[10px] font-extrabold w-[18px] h-[18px] flex items-center justify-center rounded-full">
-              0
-            </span>
+            <span className="absolute -top-1 -right-1.5 bg-[#5ec6ed] text-black text-[10px] font-extrabold w-[18px] h-[18px] flex items-center justify-center rounded-full">0</span>
           </button>
 
-          {/* BOTÓN HAMBURGUESA (MÓVIL) */}
           <button className="lg:hidden text-white flex-shrink-0" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
             </svg>
           </button>
-
         </div>
       </nav>
 
-      {/* --- MENÚ LATERAL MÓVIL (DRAWER) --- */}
+      {/* --- MENÚ LATERAL MÓVIL (ACORDEÓN) --- */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 z-[1001]"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-            <motion.div 
-              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-              className="fixed top-0 right-0 h-full w-[85%] bg-[#0a0a0a] z-[1002] p-8 shadow-2xl overflow-y-auto"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 z-[1001]" onClick={() => setIsMobileMenuOpen(false)} />
+            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="fixed top-0 right-0 h-full w-[85%] bg-[#0a0a0a] z-[1002] p-8 shadow-2xl overflow-y-auto">
               <div className="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
                 <span className="text-[#5ec6ed] font-bold tracking-[0.3em] text-sm uppercase">NEXUS MENU</span>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-white/50 hover:text-white">✕</button>
               </div>
               
-              <div className="flex flex-col gap-8">
-                {Object.keys(menuData).map((tab) => (
-                  <div key={tab} className="flex flex-col gap-4">
-                    <button onClick={() => handleSelect(tab)} className="text-left text-white text-xl font-black italic tracking-tighter uppercase">
-                      {tab}
-                    </button>
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-2 pl-4 border-l border-[#5ec6ed]/20">
-                      {Object.keys(menuData[tab]).map(sub => (
-                        <button key={sub} onClick={() => handleSelect(sub)} className="text-left text-zinc-500 text-[10px] font-bold uppercase tracking-widest hover:text-[#5ec6ed]">
-                          {sub}
+              <div className="flex flex-col gap-6">
+                {Object.keys(menuData).map((tab) => {
+                  // NUEVA LÓGICA: Comprueba si esta pestaña tiene submenús
+                  const hasSubMenu = Object.keys(menuData[tab] || {}).length > 0;
+
+                  return (
+                    <div key={tab} className="flex flex-col gap-3">
+                      
+                      {/* Si TIENE submenú, muestra el acordeón con el "+" */}
+                      {hasSubMenu ? (
+                        <button 
+                          onClick={() => setMobileExpandedTab(mobileExpandedTab === tab ? null : tab)} 
+                          className="flex justify-between items-center text-left text-white text-xl font-black italic tracking-tighter uppercase"
+                        >
+                          {tab}
+                          <span className="text-[#5ec6ed] text-2xl font-normal">{mobileExpandedTab === tab ? '-' : '+'}</span>
                         </button>
-                      ))}
+                      ) : (
+                        /* Si NO TIENE submenú (ej. Mundial 2026), es un enlace directo */
+                        <button 
+                          onClick={() => handleSelect(tab)} 
+                          className="flex justify-between items-center text-left text-white text-xl font-black italic tracking-tighter uppercase hover:text-[#5ec6ed] transition-colors"
+                        >
+                          {tab}
+                        </button>
+                      )}
+                      
+                      {/* Nivel 2 (Ligas / Subcategorías) */}
+                      {hasSubMenu && mobileExpandedTab === tab && (
+                        <div className="flex flex-col gap-4 pl-4 border-l border-[#5ec6ed]/30 mt-2">
+                          {Object.keys(menuData[tab]).map(sub => (
+                            <div key={sub} className="flex flex-col gap-2">
+                              <button 
+                                onClick={() => setMobileExpandedSub(mobileExpandedSub === sub ? null : sub)}
+                                className="flex justify-between items-center text-left text-zinc-300 text-sm font-bold uppercase tracking-widest"
+                              >
+                                {sub}
+                                <span className="text-[#5ec6ed] text-lg">{mobileExpandedSub === sub ? '-' : '+'}</span>
+                              </button>
+                              
+                              {/* Nivel 3 (Equipos / Países) */}
+                              {mobileExpandedSub === sub && (
+                                <div className="grid grid-cols-2 gap-y-4 gap-x-2 pl-4 py-3 bg-white/5 rounded-md mt-1">
+                                  <button onClick={() => handleSelect(sub)} className="col-span-2 text-left text-[#5ec6ed] text-[11px] font-black uppercase mb-2">
+                                    VER TODO {sub} ➔
+                                  </button>
+                                  
+                                  {Array.isArray(menuData[tab][sub]) ? (
+                                    menuData[tab][sub].map(team => (
+                                      <button key={team} onClick={() => handleSelect(team)} className="text-left text-zinc-400 text-[10px] font-bold uppercase tracking-wider hover:text-white">
+                                        {team}
+                                      </button>
+                                    ))
+                                  ) : (
+                                    Object.keys(menuData[tab][sub]).map(cont => (
+                                      <div key={cont} className="col-span-2 flex flex-col gap-2 mb-2">
+                                        <span className="text-white text-[11px] font-black border-b border-white/10 pb-1">{cont}</span>
+                                        <div className="grid grid-cols-2 gap-3 mt-1">
+                                          {menuData[tab][sub][cont].map(country => (
+                                            <button key={country} onClick={() => handleSelect(country)} className="text-left text-zinc-400 text-[10px] font-bold uppercase hover:text-white">
+                                              {country}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    ))
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </motion.div>
           </>
