@@ -4,18 +4,31 @@ const ImageZoom = ({ src }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [showZoom, setShowZoom] = useState(false);
 
+  // Esta función detecta mágicamente si el dispositivo tiene un mouse/cursor real
+  const hasMouse = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
   const handleMouseMove = (e) => {
+    // Si no tiene mouse (es un celular/tablet), abortamos la función
+    if (!hasMouse()) return;
+
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.pageX - left) / width) * 100;
     const y = ((e.pageY - top) / height) * 100;
     setPosition({ x, y });
   };
 
+  const handleMouseEnter = () => {
+    // Solo activamos el zoom si el dispositivo tiene un mouse real
+    if (hasMouse()) {
+      setShowZoom(true);
+    }
+  };
+
   return (
     <div 
-      className="relative overflow-hidden cursor-zoom-in bg-zinc-900 rounded-sm w-full h-full"
+      className="relative overflow-hidden lg:cursor-zoom-in bg-zinc-900 rounded-sm w-full h-full"
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setShowZoom(true)}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setShowZoom(false)}
     >
       <img 
