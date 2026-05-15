@@ -1,0 +1,46 @@
+# Logs
+.env
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+cargar_catalogo.py
+cargar.py
+cargue-club.py
+cargue.py
+migracion.py
+subir-club.py
+ca.py
+simulacion2.py
+verificarEstructuraCerosUnos.py
+# Ignorar el archivo de variables
+.env
+
+# Ignorar TODOS los scripts de Python para que no busquen secretos en ellos
+*.py
+
+# Ignorar carpetas de scripts antiguos
+scripts-cargue-malos/
+
+# Excepto el script que sí quieres usar (opcional, o puedes correrlo localmente sin subirlo)
+cargar-selecciones.py
+

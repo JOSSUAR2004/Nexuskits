@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+@layer base {
+  body {
+    @apply bg-black text-white antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Títulos de sección más técnicos */
+.section-title {
+  @apply text-[11px] font-bold uppercase tracking-[0.4em] text-zinc-400 border-l-2 border-white pl-4;
+}
+
+/* Efecto de carga en imágenes para parecer software logístico */
+.product-img-box {
+  @apply relative aspect-square bg-[#0a0a0a] overflow-hidden border border-white/[0.03] transition-all duration-500 group-hover:border-white/10;
+}
+
+/* El nombre del producto en Nexus Kits */
+.product-name-ref {
+  @apply text-[13px] font-normal text-zinc-300 transition-colors duration-300 tracking-tight;
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* El precio como costo unitario */
+.product-price-ref {
+  @apply text-[10px] mt-4 font-bold text-zinc-600 uppercase tracking-widest;
+}
+/* Efecto para NEXUS: Degradado azul/celeste similar a la imagen */
+.text-nexus-gradient {
+  background: linear-gradient(to bottom, #7dd3fc, #38bdf8); /* Tonos celestes */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* Efecto para KITS: Solo el borde blanco/gris */
+.text-outline-kits {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5); /* Borde fino */
+  letter-spacing: -0.02em;
+  transition: -webkit-text-stroke 0.3s ease;
+}
+
+.group:hover .text-outline-kits {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.9); /* Brilla más al pasar el mouse */
+}
+
+html {
+  /* Evita el salto horizontal al aparecer/desaparecer el scroll */
+  overflow-y: scroll;
+}
+
+/* Opcional: Personaliza la barra para que sea minimalista en modo oscuro */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #5ec6ed;
+  border-radius: 10px;
+}
+/* En tu index.css */
+.product-img-box {
+  background: linear-gradient(90deg, #121212 25%, #1a1a1a 50%, #121212 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Ajuste para que el Navbar no tape el contenido */
+.main-wrapper {
+  padding-top: 20px;
+}
+
+/* Animación sutil para los resultados */
+.grid > div {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
