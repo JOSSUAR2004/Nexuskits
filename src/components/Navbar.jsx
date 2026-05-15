@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { menuData as staticMenuData } from '../data/navigation';
 
-export default function Navbar({ setCategoriaActual, setBusqueda, onNavAction, camisetas = [] }) {
+export default function Navbar({ setCategoriaActual, setBusqueda, busqueda, onNavAction, camisetas = [] }) {
   const [activeTab, setActiveTab] = useState(null);
   const [activeSub, setActiveSub] = useState(null);
   const [activeThird, setActiveThird] = useState(null);
@@ -44,7 +44,8 @@ export default function Navbar({ setCategoriaActual, setBusqueda, onNavAction, c
 
   const handleSelect = (cat) => {
     setCategoriaActual(cat);
-    if (setBusqueda) setBusqueda('');
+    // Limpiamos la búsqueda al navegar
+    if (setBusqueda) setBusqueda(''); 
     if (onNavAction) onNavAction();
     resetMenu();
     setIsMobileMenuOpen(false);
@@ -67,7 +68,7 @@ export default function Navbar({ setCategoriaActual, setBusqueda, onNavAction, c
         className="sticky top-0 z-[1000] bg-black flex items-center h-[85px] px-6 md:px-12 border-b border-white/5"
         onMouseLeave={resetMenu}
       >
-        {/* LOGO */}
+        {/* --- LOGO --- */}
         <div className="flex-none mr-8 md:mr-14">
           <Link to="/" onClick={() => handleSelect('Todas')} className="flex flex-col leading-[0.75] select-none italic">
             <span className="text-[24px] md:text-[30px] font-[1000] tracking-tighter text-[#5ec6ed] uppercase">NEXUS</span>
@@ -75,7 +76,7 @@ export default function Navbar({ setCategoriaActual, setBusqueda, onNavAction, c
           </Link>
         </div>
 
-        {/* MENÚ PRINCIPAL (ESCRITORIO) */}
+        {/* --- MENÚ PRINCIPAL (ESCRITORIO) --- */}
         <div className="hidden lg:flex flex-1 items-center justify-start gap-9 h-full">
           {Object.keys(menuData).map((tab) => (
             <div
@@ -160,27 +161,41 @@ export default function Navbar({ setCategoriaActual, setBusqueda, onNavAction, c
           ))}
         </div>
 
-        {/* BUSCADOR */}
-        <div className="flex-1 lg:flex-none ml-auto max-w-[180px] md:max-w-[300px]">
-          <div className="relative group">
+        {/* --- ÁREA DERECHA: Buscador + Carrito + Menú Móvil --- */}
+        <div className="flex items-center gap-4 md:gap-7 ml-auto">
+          
+          {/* BUSCADOR CONTROLADO */}
+          <div className="relative group w-[140px] md:w-[220px] lg:w-[280px]">
             <input
               type="text"
               placeholder="BUSCAR..."
-              className="w-full bg-white/5 border border-white/10 px-4 py-2 rounded-sm text-[10px] tracking-[0.2em] uppercase focus:border-[#5ec6ed]/50 outline-none transition-all text-white placeholder:text-zinc-700"
+              value={busqueda || ''} // Conectado al estado para que se limpie
+              className="w-full bg-white/5 border border-white/10 px-3 py-2 rounded-sm text-[9px] md:text-[10px] tracking-[0.2em] uppercase focus:border-[#5ec6ed]/50 outline-none transition-all text-white placeholder:text-zinc-700"
               onChange={(e) => setBusqueda(e.target.value)}
             />
           </div>
-        </div>
 
-        {/* BOTÓN HAMBURGUESA (MÓVIL) */}
-        <button className="ml-4 lg:hidden text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-          </svg>
-        </button>
+          {/* ICONO DE CARRITO */}
+          <button className="relative text-white/90 hover:text-[#5ec6ed] transition-colors flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 md:w-7 md:h-7">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+            <span className="absolute -top-1 -right-1.5 bg-[#5ec6ed] text-black text-[10px] font-extrabold w-[18px] h-[18px] flex items-center justify-center rounded-full">
+              0
+            </span>
+          </button>
+
+          {/* BOTÓN HAMBURGUESA (MÓVIL) */}
+          <button className="lg:hidden text-white flex-shrink-0" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
+
+        </div>
       </nav>
 
-      {/* MENÚ LATERAL MÓVIL (DRAWER) */}
+      {/* --- MENÚ LATERAL MÓVIL (DRAWER) --- */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>

@@ -170,6 +170,7 @@ useEffect(() => {
       <Navbar
         setCategoriaActual={setCategoriaActual}
         setBusqueda={setBusqueda}
+        busqueda={busqueda} // <--- ¡Asegúrate de que esta línea exista!
         categoriaActual={categoriaActual}
         onNavAction={() => setSelectedProduct(null)}
         camisetas={menuData}
